@@ -1,0 +1,1 @@
+Insert your API key in the config.cfg file. - (http://forecast.io/)
