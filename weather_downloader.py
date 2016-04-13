@@ -1,4 +1,4 @@
-﻿import ConfigParser
+import ConfigParser
 import csv
 import datetime
 import json
@@ -30,31 +30,44 @@ def writeJsonToCSV(jsonObj, filePath):
 		with open(filePath, 'wb') as csvfile:
 			writer = csv.writer(csvfile)
 			
-			head = True
+			head = []
 			for row in jsonObj:
-				buffer = []
 				
-				if head:
-					for attr in row:
-						buffer.append(attr)
-					head = False
-					writer.writerow(buffer)
-					buffer = []
-					
 				for attr in row:
-					buffer.append(row[attr])
-				writer.writerow(buffer)
+					if attr not in head:
+						head.append(attr)
+			
+			writer.writerow(head)
+			
+			writerBuffer = []
+			for row in jsonObj:
+				
+				buffer = []
+				for attr in head:
+				
+					if attr in row:
+						buffer.append(row[attr])
+					else:
+						buffer.append('')
+					
+				writerBuffer.append(buffer)
+				
+			for row in writerBuffer:
+				writer.writerow(row)
 		
 		logging.info(' '.join([filePath, ' - COMPLETED..']))
 	
 	except Exception as e:
 		logging.exception(e)
+
 		
 def downloadWeatherJsonToCSV(url, filePath):
+
 	try:
 		response = json.loads(urlopen(url).read())
 		writeJsonToCSV(response['hourly']['data'], filePath + '_hourly.csv')
 		writeJsonToCSV(response['daily']['data'], filePath + '_daily.csv')
+	
 	except Exception as e:
 		logging.exception(e)
 
